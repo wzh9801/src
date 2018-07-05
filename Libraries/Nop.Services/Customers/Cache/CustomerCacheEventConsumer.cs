@@ -1,0 +1,41 @@
+﻿using Nop.Core.Caching;
+using Nop.Core.Domain.Customers;
+using Nop.Services.Events;
+
+namespace Nop.Services.Customers.Cache
+{
+    /// <summary>
+    /// Customer cache event consumer (used for caching of current customer password)
+    /// </summary>
+    public partial class CustomerCacheEventConsumer : IConsumer<CustomerPasswordChangedEvent>
+    {
+        #region Fields
+
+        private readonly IStaticCacheManager _cacheManager;
+
+        #endregion
+
+        #region Ctor
+
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        /// <param name="cacheManager">Cache manager</param>
+        public CustomerCacheEventConsumer(IStaticCacheManager cacheManager)
+        {
+            this._cacheManager = cacheManager;
+        }
+
+        #endregion
+
+        #region Methods
+
+        //password changed
+        public void HandleEvent(CustomerPasswordChangedEvent eventMessage)
+        {
+            _cacheManager.Remove(string.Format(NopCustomerServiceDefaults.CustomerPasswordLifetimeCacheKey, eventMessage.Password.CustomerId));
+        }
+
+        #endregion
+    }
+}
